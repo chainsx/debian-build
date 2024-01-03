@@ -1,0 +1,17 @@
+bc
+cpufrequtils
+debconf-utils
+device-tree-compiler
+dialog
+figlet
+fping
+ncurses-term
+nocache
+openssh-server
+parted
+psmisc
+python3-apt
+sysfsutils
+toilet
+u-boot-tools
+usbutils

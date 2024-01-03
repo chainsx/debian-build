@@ -1,0 +1,15 @@
+cracklib-runtime
+curl
+htop
+iozone3
+jq
+libcrack2
+lsof
+mc
+mmc-utils
+net-tools
+netplan.io
+network-manager
+resolvconf
+wget
+wireless-tools
