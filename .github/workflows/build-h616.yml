@@ -1,4 +1,4 @@
-name: QEMU-Build-Fedora
+name: Build-H616-Debian
 on:
   workflow_dispatch:
 
