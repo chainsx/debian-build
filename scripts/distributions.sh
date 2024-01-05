@@ -169,8 +169,6 @@ install_common()
         install_deb_chroot "${DEB_STORAGE}/${CHOSEN_KERNEL/image/dtb}_${REVISION}_${ARCH}.deb"
     fi
 
-    install_deb_chroot "${DEB_STORAGE}/${CHOSEN_KERNEL/image/headers}_${REVISION}_${ARCH}.deb"
-
 	# install board support packages
 	install_deb_chroot "${DEB_STORAGE}/$RELEASE/${BSP_CLI_PACKAGE_FULLNAME}.deb" | tee "${DEST}"/${LOG_SUBPATH}/install.log 2>&1
 
@@ -243,9 +241,6 @@ install_common()
 	# disable repeated messages due to xconsole not being installed.
 	[[ -f "${SDCARD}"/etc/rsyslog.d/50-default.conf ]] && \
 	sed '/daemon\.\*\;mail.*/,/xconsole/ s/.*/#&/' -i "${SDCARD}"/etc/rsyslog.d/50-default.conf
-
-	# disable deprecated parameter
-	sed '/.*$KLogPermitNonKernelFacility.*/,// s/.*/#&/' -i "${SDCARD}"/etc/rsyslog.conf
 
 	# enable getty on multiple serial consoles
 	# and adjust the speed if it is defined and different than 115200

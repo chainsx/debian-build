@@ -439,7 +439,7 @@ prepare_partitions()
 
 	# stage: mount image
 	# lock access to loop devices
-	exec {FD}>/var/lock/armbian-debootstrap-losetup
+	exec {FD}> /var/lock/armbian-debootstrap-losetup
 	flock -x $FD
 
 	LOOP=$(losetup -f)

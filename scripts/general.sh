@@ -39,7 +39,6 @@ cleaning()
 			find "${DEB_STORAGE}" \( -name "${CHOSEN_KERNEL}_*.deb" -o \
 				-name "armbian-*.deb" -o \
 				-name "${CHOSEN_KERNEL/image/dtb}_*.deb" -o \
-				-name "${CHOSEN_KERNEL/image/headers}_*.deb" -o \
 				-name "${CHOSEN_KERNEL/image/source}_*.deb" -o \
 				-name "${CHOSEN_KERNEL/image/firmware-image}_*.deb" \) -delete
 			[[ -n $RELEASE ]] && rm -f "${DEB_STORAGE}/${RELEASE}/${CHOSEN_ROOTFS}"_*.deb

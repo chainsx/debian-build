@@ -16,7 +16,7 @@ umask 002
 
 DEST="${SRC}"/output
 
-REVISION="3.0.0"
+REVISION="4.0.0"
 NTP_SERVER="cn.pool.ntp.org"
 titlestr="Choose an option"
 
@@ -58,33 +58,17 @@ SHOW_WARNING=yes
 CCACHE=ccache
 export PATH="/usr/lib/ccache:$PATH"
 
-if [[ -z $BUILD_OPT ]]; then
-	options+=("u-boot"	 "U-boot package")
-	options+=("kernel"	 "Kernel package")
-	options+=("rootfs"	 "Rootfs and all deb packages")
-	options+=("image"	 "Full OS image for flashing")
-
-	menustr="Compile image | rootfs | kernel | u-boot"
-	BUILD_OPT=$(whiptail --title "${titlestr}" --backtitle "${backtitle}" --notags \
-			  --menu "${menustr}" "${TTY_Y}" "${TTY_X}" $((TTY_Y - 8))  \
-			  --cancel-button Exit --ok-button Select "${options[@]}" \
-			  3>&1 1>&2 2>&3)
-
-	unset options
-	[[ -z $BUILD_OPT ]] && exit_with_error "No option selected"
-	[[ $BUILD_OPT == rootfs ]] && ROOT_FS_CREATE_ONLY="yes"
-fi
-
-KERNEL_CONFIGURE="no"
-[[ $BUILD_OPT == kernel ]] && KERNEL_CONFIGURE="yes"
-
-[[ $MANUAL_KERNEL_CONFIGURE == yes ]] && KERNEL_CONFIGURE="yes"
-[[ $MANUAL_KERNEL_CONFIGURE == no ]] && KERNEL_CONFIGURE="no"
-
 BOOTCONFIG="yuzukichameleon_defconfig"
 LINUXFAMILY="sun50iw9"
 
 ###################################################
+BUILD_OPT="image"              # u-boot, kernel, rootfs, image
+[[ $BUILD_OPT == rootfs ]] && ROOT_FS_CREATE_ONLY="yes"
+KERNEL_CONFIGURE="no"
+[[ $BUILD_OPT == kernel ]] && KERNEL_CONFIGURE="yes"
+[[ $MANUAL_KERNEL_CONFIGURE == yes ]] && KERNEL_CONFIGURE="yes"
+[[ $MANUAL_KERNEL_CONFIGURE == no ]] && KERNEL_CONFIGURE="no"
+
 BOARD="h616"
 BOARD_NAME="cxcore"
 
