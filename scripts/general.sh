@@ -595,10 +595,6 @@ prepare_host()
 	fi
 	mkdir -p $DEST/debs/{extra,u-boot}  $DEST/{config,debug,patch,images} $USERPATCHES_PATH/overlay $EXTER/cache/{debs,sources,hash} $SRC/.tmp
 
-    cd $SRC/toolchains/
-    display_alert "Checking for external GCC compilers" "" "info"
-    [[ ! -d libexec ]] && sudo cat libexec.tar.gz* | sudo tar zx
-
 	# enable arm binary format so that the cross-architecture chroot environment will work
 	if [[ $BUILD_OPT == "image" || $BUILD_OPT == "rootfs" ]]; then
 		modprobe -q binfmt_misc

@@ -109,8 +109,24 @@ branch2dir() {
 
 BOOTSOURCEDIR="${BOOTDIR}"
 LINUXSOURCEDIR="${KERNELDIR}"
+ATFSOURCEDIR=${ATFDIR}
 
-[[ -n $ATFSOURCE ]] && ATFSOURCEDIR="${ATFDIR}/$(branch2dir "${ATFBRANCH}")"
+if [ ! -d ${LINUXSOURCEDIR} ]; then
+	git clone --depth=1 -b ${LINUXBRANCH} ${LINUXSOURCE} ${KERNELDIR}
+fi
+
+if [ ! -d ${BOOTSOURCEDIR} ]; then
+	git clone --depth=1 -b ${BOOTBRANCH} ${BOOTSOURCE} ${BOOTDIR}
+	cat ${SRC}/external/patch/u-boot/*.patch >> ${BOOTDIR}/new.patch
+	pushd ${BOOTDIR}
+	patch -p1 < new.patch
+	rm new.patch
+	popd
+fi
+
+if [ ! -d ${ATFSOURCEDIR} ]; then
+	git clone --depth=1 -b ${ATFBRANCH} ${ATFSOURCE} ${ATFDIR}
+fi
 
 BSP_CLI_PACKAGE_NAME="bsp-cli-${BOARD}"
 BSP_CLI_PACKAGE_FULLNAME="${BSP_CLI_PACKAGE_NAME}_${REVISION}_${ARCH}"

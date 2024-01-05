@@ -79,7 +79,7 @@ compile_uboot()
 
 	cd "${ubootdir}" || exit
 
-	display_alert "Compiling u-boot" "v2021.10" "info"
+	display_alert "Compiling u-boot" "${BOOTBRANCH}" "info"
 	display_alert "Compiler version" "${UBOOT_COMPILER}gcc $(eval env PATH="${toolchain}:${PATH}" "${UBOOT_COMPILER}gcc" -dumpversion)" "info"
 
 	# create directory structure for the .deb package
