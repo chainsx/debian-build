@@ -77,7 +77,7 @@ USER_PWD="cxcore"
 ROOT_PWD="root"             # Must be changed @first login
 
 BRANCH="current"
-RELEASE="bullseye"          # 发行版本 bookworm/bullseye/focal/jammy 可选   
+RELEASE="jammy"          # 发行版本 bookworm/bullseye/focal/jammy 可选   
 SELECTED_CONFIGURATION="cli_standard"
 ###################################################
 
