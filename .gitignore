@@ -17,14 +17,11 @@
 .tmp
 .vscode
 output
-nfs_folder
-!nfs_folder/update_kernel.sh
-
-toolchains/libexec/
+external/cache
 
 *.changes
 *.buildinfo
 
-external/cache/.gpg
-external/cache/hash
-external/cache/rootfs
+kernel
+u-boot
+atf

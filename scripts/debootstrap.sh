@@ -492,6 +492,7 @@ prepare_partitions()
 	if [[ -f $SDCARD/boot/BoardEnv.txt ]]; then
 		echo "rootdev=$rootfs" >> $SDCARD/boot/BoardEnv.txt
 		echo "rootfstype=$ROOTFS_TYPE" >> $SDCARD/boot/BoardEnv.txt
+		echo "fdtfile=$BOOT_FDT_FILE.dtb" >> $SDCARD/boot/BoardEnv.txt
 	elif [[ $rootpart != 1 ]]; then
 		local bootscript_dst=${BOOTSCRIPT##*:}
 		sed -i 's/mmcblk0p1/mmcblk0p2/' $SDCARD/boot/$bootscript_dst

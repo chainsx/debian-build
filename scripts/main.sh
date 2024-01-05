@@ -81,15 +81,15 @@ KERNEL_CONFIGURE="no"
 [[ $MANUAL_KERNEL_CONFIGURE == yes ]] && KERNEL_CONFIGURE="yes"
 [[ $MANUAL_KERNEL_CONFIGURE == no ]] && KERNEL_CONFIGURE="no"
 
-BOOTCONFIG="h616_defconfig"
+BOOTCONFIG="yuzukichameleon_defconfig"
 LINUXFAMILY="sun50iw9"
 
 ###################################################
 BOARD="h616"
-BOARD_NAME="debian"
+BOARD_NAME="cxcore"
 
-USER_NAME="lodge"
-USER_PWD="lodge"
+USER_NAME="cxcore"
+USER_PWD="cxcore"
 ROOT_PWD="root"             # Must be changed @first login
 
 BRANCH="current"
@@ -117,7 +117,7 @@ fi
 
 if [ ! -d ${BOOTSOURCEDIR} ]; then
 	git clone --depth=1 -b ${BOOTBRANCH} ${BOOTSOURCE} ${BOOTDIR}
-	cat ${SRC}/external/patch/u-boot/*.patch >> ${BOOTDIR}/new.patch
+	cat ${SRC}/patch/u-boot/*.patch >> ${BOOTDIR}/new.patch
 	pushd ${BOOTDIR}
 	patch -p1 < new.patch
 	rm new.patch

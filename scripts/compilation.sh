@@ -7,7 +7,6 @@
 # compile_uboot
 # compile_kernel
 # compile_sunxi_tools
-# advanced_patch
 # process_patch_file
 # overlayfs_wrapper
 
@@ -15,10 +14,10 @@ compile_atf()
 {
 	if [[ $CLEAN_LEVEL == *make* ]]; then
 		display_alert "Cleaning" "$ATFSOURCEDIR" "info"
-		(cd "${EXTER}/cache/sources/${ATFSOURCEDIR}"; make distclean > /dev/null 2>&1)
+		(cd "${ATFSOURCEDIR}"; make distclean > /dev/null 2>&1)
 	fi
 
-	cd "$EXTER/cache/sources/$ATFSOURCEDIR" 
+	cd "$ATFSOURCEDIR" 
 
 	display_alert "Compiling ATF" "" "info"
 	display_alert "Compiler version" "${ATF_COMPILER}gcc $(eval env PATH="${toolchain}:${PATH}" "${ATF_COMPILER}gcc" -dumpversion)" "info"
@@ -27,8 +26,6 @@ compile_atf()
 	target_make=$(cut -d';' -f1 <<< "${ATF_TARGET_MAP}")
 	target_patchdir=$(cut -d';' -f2 <<< "${ATF_TARGET_MAP}")
 	target_files=$(cut -d';' -f3 <<< "${ATF_TARGET_MAP}")
-
-	advanced_patch "atf" "${ATFPATCHDIR}" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
 
 	echo -e "\n\t==  atf  ==\n" >> "${DEST}"/${LOG_SUBPATH}/compilation.log
 	# ENABLE_BACKTRACE="0" has been added to workaround a regression in ATF.
@@ -102,8 +99,6 @@ compile_uboot()
 			(cd "${BOOTSOURCEDIR}"; make clean > /dev/null 2>&1)
 		fi
 
-		advanced_patch "u-boot" "$BOOTPATCHDIR" "$BOARD" "$target_patchdir" "$BRANCH" "${LINUXFAMILY}-${BOARD}-${BRANCH}"
-
 		if [[ -n $ATFSOURCE ]]; then
 			cp -Rv "${atftempdir}"/*.bin .
 			rm -rf "${atftempdir}"
@@ -111,13 +106,10 @@ compile_uboot()
 
 		echo -e "\n\t== u-boot make $BOOTCONFIG ==\n" >> "${DEST}"/${LOG_SUBPATH}/compilation.log
 		eval CCACHE_BASEDIR="$(pwd)" env PATH="${toolchain}:${PATH}" \
-			'make $CTHREADS $BOOTCONFIG \
+			'make ARCH="arm" $CTHREADS $BOOTCONFIG \
 			CROSS_COMPILE="$CCACHE $UBOOT_COMPILER"' 2>> "${DEST}"/${LOG_SUBPATH}/compilation.log \
 			${PROGRESS_LOG_TO_FILE:+' | tee -a $DEST/${LOG_SUBPATH}/compilation.log'} \
 			${OUTPUT_VERYSILENT:+' >/dev/null 2>/dev/null'}
-
-        [[ -f .config ]] && sed -i "s/^CONFIG_LOCALVERSION=.*$/CONFIG_LOCALVERSION=\"-->${BOARD_NAME}\"/" .config
-        [[ -f .config ]] && sed -i 's/CONFIG_LOCALVERSION_AUTO=.*/# CONFIG_LOCALVERSION_AUTO is not set/g' .config
 
         [[ -f tools/logos/udoo.bmp ]] && cp "${EXTER}"/packages/blobs/splash/udoo.bmp tools/logos/udoo.bmp
         touch .scmversion
@@ -217,7 +209,6 @@ compile_kernel()
 
 	# build 3rd party drivers
 	# compilation_prepare
-	advanced_patch "kernel" "$KERNELPATCHDIR" "$BOARD" "" "$BRANCH" "$LINUXFAMILY-$BRANCH"
 	display_alert "Compiling $BRANCH kernel" "5.16.17" "info"
 	display_alert "Compiler version" "${KERNEL_COMPILER}gcc $(eval env PATH="${toolchain}:${PATH}" "${KERNEL_COMPILER}gcc" -dumpversion)" "info"
 
@@ -229,9 +220,6 @@ compile_kernel()
 		display_alert "Using kernel config file" "${EXTER}/config/kernel/$LINUXCONFIG.config" "info"
 		cp -p "${EXTER}/config/kernel/${LINUXCONFIG}.config" .config
 	fi
-
-	# hack for deb builder. To pack what's missing in headers pack.
-	cp "$EXTER"/patch/misc/headers-debian-byteshift.patch /tmp
 
 	if [[ $KERNEL_CONFIGURE != yes ]]; then
         # TODO: check if required
@@ -317,117 +305,6 @@ compile_sunxi_tools()
     make install-tools >/dev/null 2>&1
 }
 
-# advanced_patch <dest> <family> <board> <target> <branch> <description>
-#
-# parameters:
-# <dest>: u-boot, kernel, atf
-# <family>: u-boot: u-boot; kernel: sunxi-next, ...
-# <target>: optional subdirectory
-# <description>: additional description text
-#
-# priority:
-# $EXTER/patch/<dest>/<family>/target_<target>
-# $EXTER/patch/<dest>/<family>/board_<board>
-# $EXTER/patch/<dest>/<family>/branch_<branch>
-# $EXTER/patch/<dest>/<family>
-#
-advanced_patch()
-{
-	local dest=$1
-	local family=$2
-	local board=$3
-	local target=$4
-	local branch=$5
-	local description=$6
-
-	display_alert "Started patching process for" "$dest $description" "info"
-	display_alert "Looking for user patches in" "userpatches/$dest/$family" "info"
-
-	local names=()
-	local dirs=(
-		"$USERPATCHES_PATH/$dest/$family/target_${target}:[\e[33mu\e[0m][\e[34mt\e[0m]"
-		"$USERPATCHES_PATH/$dest/$family/board_${board}:[\e[33mu\e[0m][\e[35mb\e[0m]"
-		"$USERPATCHES_PATH/$dest/$family/branch_${branch}:[\e[33mu\e[0m][\e[33mb\e[0m]"
-		"$USERPATCHES_PATH/$dest/$family:[\e[33mu\e[0m][\e[32mc\e[0m]"
-		"$EXTER/patch/$dest/$family/target_${target}:[\e[32ml\e[0m][\e[34mt\e[0m]"
-		"$EXTER/patch/$dest/$family/board_${board}:[\e[32ml\e[0m][\e[35mb\e[0m]"
-		"$EXTER/patch/$dest/$family/branch_${branch}:[\e[32ml\e[0m][\e[33mb\e[0m]"
-		"$EXTER/patch/$dest/$family:[\e[32ml\e[0m][\e[32mc\e[0m]"
-		)
-	local links=()
-
-	# required for "for" command
-	shopt -s nullglob dotglob
-	# get patch file names
-	for dir in "${dirs[@]}"; do
-		for patch in ${dir%%:*}/*.patch; do
-			names+=($(basename "${patch}"))
-		done
-		# add linked patch directories
-		if [[ -d ${dir%%:*} ]]; then
-			local findlinks
-			findlinks=$(find "${dir%%:*}" -maxdepth 1 -type l -print0 2>&1 | xargs -0)
-			[[ -n $findlinks ]] && readarray -d '' links < <(find "${findlinks}" -maxdepth 1 -type f -follow -print -iname "*.patch" -print | grep "\.patch$" | sed "s|${dir%%:*}/||g" 2>&1)
-		fi
-	done
-	# merge static and linked
-	names=("${names[@]}" "${links[@]}")
-	# remove duplicates
-	local names_s=($(echo "${names[@]}" | tr ' ' '\n' | LC_ALL=C sort -u | tr '\n' ' '))
-	# apply patches
-	for name in "${names_s[@]}"; do
-		for dir in "${dirs[@]}"; do
-			if [[ -f ${dir%%:*}/$name ]]; then
-				if [[ -s ${dir%%:*}/$name ]]; then
-					process_patch_file "${dir%%:*}/$name" "${dir##*:}"
-				else
-					display_alert "* ${dir##*:} $name" "skipped"
-				fi
-				break # next name
-			fi
-		done
-	done
-}
-
-# process_patch_file <file> <description>
-#
-# parameters:
-# <file>: path to patch file
-# <status>: additional status text
-#
-process_patch_file()
-{
-	local patch=$1
-	local status=$2
-
-	# detect and remove files which patch will create
-	lsdiff -s --strip=1 "${patch}" | grep '^+' | awk '{print $2}' | xargs -I % sh -c 'rm -f %'
-
-	echo "Processing file $patch" >> "${DEST}"/${LOG_SUBPATH}/patching.log
-	patch --batch --silent -p1 -N < "${patch}" >> "${DEST}"/${LOG_SUBPATH}/patching.log 2>&1
-
-	if [[ $? -ne 0 ]]; then
-		display_alert "* $status $(basename "${patch}")" "failed" "wrn"
-		[[ $EXIT_PATCHING_ERROR == yes ]] && exit_with_error "Aborting due to" "EXIT_PATCHING_ERROR"
-	else
-		display_alert "* $status $(basename "${patch}")" "" "info"
-	fi
-	echo >> "${DEST}"/${LOG_SUBPATH}/patching.log
-}
-
-# overlayfs_wrapper <operation> <workdir> <description>
-#
-# <operation>: wrap|cleanup
-# <workdir>: path to source directory
-# <description>: suffix for merged directory to help locating it in /tmp
-# return value: new directory
-#
-# Assumptions/notes:
-# - Ubuntu Xenial host
-# - /tmp is mounted as tmpfs
-# - there is enough space on /tmp
-# - UB if running multiple compilation tasks in parallel
-#
 overlayfs_wrapper()
 {
 	local operation="$1"
