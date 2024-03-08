@@ -13,8 +13,8 @@ family_tweaks()
 	# execute specific tweaks function if present
 	[[ $(type -t family_tweaks_s) == function ]] && family_tweaks_s
 
-    [[ $RELEASE == bookworm ]] && dpkg_install_deb_chroot "$EXTER/cache/debs/extra/${RELEASE}-utils/wpasupplicant_2.10-9_arm64.deb"
-    [[ $RELEASE == jammy ]] && dpkg_install_deb_chroot "$EXTER/cache/debs/extra/${RELEASE}-utils/wpasupplicant_2.10-6ubuntu1_arm64.deb"
+    #[[ $RELEASE == bookworm ]] && dpkg_install_deb_chroot "$EXTER/cache/debs/extra/${RELEASE}-utils/wpasupplicant_2.10-9_arm64.deb"
+    #[[ $RELEASE == jammy ]] && dpkg_install_deb_chroot "$EXTER/cache/debs/extra/${RELEASE}-utils/wpasupplicant_2.10-6ubuntu1_arm64.deb"
 
 	rm $SDCARD/root/*.deb >/dev/null 2>&1
 }
