@@ -99,8 +99,7 @@ create_rootfs_cache()
 		display_alert "local not found" "Creating new rootfs cache for $RELEASE" "info"
 
         # apt-cacher-ng apt-get proxy parameter
-        local apt_extra="-o Acquire::http::Proxy=\"http://${APT_PROXY_ADDR:-localhost:3142}\""
-        local apt_mirror="http://${APT_PROXY_ADDR:-localhost:3142}/$APT_MIRROR"
+        local apt_mirror="http://$APT_MIRROR"
 
 		# fancy progress bars
 		[[ -z $OUTPUT_DIALOG ]] && local apt_extra_progress="--show-progress -o DPKG::Progress-Fancy=1"
