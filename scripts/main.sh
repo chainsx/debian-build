@@ -101,11 +101,6 @@ fi
 
 if [ ! -d ${BOOTSOURCEDIR} ]; then
 	git clone --depth=1 -b ${BOOTBRANCH} ${BOOTSOURCE} ${BOOTDIR}
-	cat ${SRC}/patch/u-boot/*.patch >> ${BOOTDIR}/new.patch
-	pushd ${BOOTDIR}
-	patch -p1 < new.patch
-	rm new.patch
-	popd
 fi
 
 if [ ! -d ${ATFSOURCEDIR} ]; then
