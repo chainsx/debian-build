@@ -43,8 +43,8 @@ ATF_COMPILE=yes
 [[ -z $EXTRA_BSP_NAME ]] && EXTRA_BSP_NAME=""
 [[ -z $EXTRA_ROOTFS_MIB_SIZE ]] && EXTRA_ROOTFS_MIB_SIZE=0
 
-source "${SRC}/userpatches/${LINUXFAMILY}.conf"
-source "${SRC}/userpatches/${ARCH}.conf"
+source "${SRC}/config/${LINUXFAMILY}.conf"
+source "${SRC}/config/${ARCH}.conf"
 
 show_menu() {
 	provided_title=$1

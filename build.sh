@@ -14,7 +14,7 @@ prepare_host_basic
 
 toolchain="/usr/bin"
 
-CONFIG="userpatches/config-build.conf"
+CONFIG="config/config-build.conf"
 CONFIG_FILE="$(realpath "${CONFIG}")"
 CONFIG_PATH=$(dirname "${CONFIG_FILE}")
 

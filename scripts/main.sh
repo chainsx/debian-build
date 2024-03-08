@@ -16,7 +16,6 @@ umask 002
 
 DEST="${SRC}"/output
 
-REVISION="4.0.0"
 NTP_SERVER="cn.pool.ntp.org"
 titlestr="Choose an option"
 
@@ -57,29 +56,6 @@ SHOW_WARNING=yes
 
 CCACHE=ccache
 export PATH="/usr/lib/ccache:$PATH"
-
-BOOTCONFIG="yuzukichameleon_defconfig"
-LINUXFAMILY="sun50iw9"
-
-###################################################
-BUILD_OPT="image"              # u-boot, kernel, rootfs, image
-[[ $BUILD_OPT == rootfs ]] && ROOT_FS_CREATE_ONLY="yes"
-KERNEL_CONFIGURE="no"
-[[ $BUILD_OPT == kernel ]] && KERNEL_CONFIGURE="yes"
-[[ $MANUAL_KERNEL_CONFIGURE == yes ]] && KERNEL_CONFIGURE="yes"
-[[ $MANUAL_KERNEL_CONFIGURE == no ]] && KERNEL_CONFIGURE="no"
-
-BOARD="h616"
-BOARD_NAME="cxcore"
-
-USER_NAME="cxcore"
-USER_PWD="cxcore"
-ROOT_PWD="root"             # Must be changed @first login
-
-BRANCH="current"
-RELEASE="jammy"          # 发行版本 bookworm/bullseye/focal/jammy 可选   
-SELECTED_CONFIGURATION="cli_standard"
-###################################################
 
 source "${SRC}"/scripts/configuration.sh
 

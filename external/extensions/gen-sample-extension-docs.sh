@@ -8,8 +8,8 @@ function extension_metadata_ready__docs_markdown() {
 }
 
 function extension_metadata_ready__docs_sample_extension() {
-	mkdir -p "${SRC}/userpatches/extensions"
-	generate_sample_extension_to_stdout >"${SRC}/userpatches/extensions/sample-extension.sh"
+	mkdir -p "${SRC}/extensions"
+	generate_sample_extension_to_stdout >"${SRC}/extensions/sample-extension.sh"
 }
 
 ## Internal functions
